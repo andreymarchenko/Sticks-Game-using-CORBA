@@ -9,13 +9,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.io.Serializable;
 import javax.swing.JComponent;
 
 /**
  *
  * @author Andrey
  */
-public class Cell {
+public class Cell implements Serializable{
 
     private Color color = Color.WHITE;  
     private int x;

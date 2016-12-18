@@ -28,26 +28,54 @@ public class GamePanel extends JFrame {
     private GameField gameField;
     private MyListener myListener;
     private JPanel jPanel;
-    private Player firstPlayer;
-    private Player secondPlayer;
     private int cellSize;
-
+    
     public GamePanel() {
-        super("Sticks game");       
-        firstPlayer = new Player(1);
-        secondPlayer = new Player(2);
-        gameField = new GameField();
-        gameField.setFirstPlayer(firstPlayer);
-        gameField.setSecondPlayer(secondPlayer);
-        myListener = new MyListener(gameField, this, firstPlayer, secondPlayer);
-        JPanel jPanel = new JPanel(new BorderLayout());
+        super("Sticks game");
+        Game game = new Game();
+        gameField = new GameField(game);
+        myListener = new MyListener(gameField, this);
+        jPanel = new JPanel(new BorderLayout());
         jPanel.addMouseListener(myListener);
         jPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createLineBorder(Color.black)));
         jPanel.setBackground(Color.WHITE);
-        setContentPane(jPanel);
+        this.setContentPane(jPanel);
         jPanel.add(gameField, BorderLayout.CENTER);
         setSize(WIDTH, HEIGHT);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }   
+    
+    public GameField getGameField() {
+        return gameField;
     }
+
+    public void setGameField(GameField gameField) {
+        this.gameField = gameField;
+    }
+
+    public synchronized MyListener getMyListener() {
+        return myListener;
+    }
+
+    public void setMyListener(MyListener myListener) {
+        this.myListener = myListener;
+    }
+
+    public JPanel getjPanel() {
+        return jPanel;
+    }
+
+    public void setjPanel(JPanel jPanel) {
+        this.jPanel = jPanel;
+    }
+
+    public int getCellSize() {
+        return cellSize;
+    }
+
+    public void setCellSize(int cellSize) {
+        this.cellSize = cellSize;
+    }
+    
 }

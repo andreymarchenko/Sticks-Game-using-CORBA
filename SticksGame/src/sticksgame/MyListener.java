@@ -17,107 +17,177 @@ public class MyListener implements MouseListener {
 
     GameField gameField;
     GamePanel gamePanel;
-    Player firstPlayer;
-    Player secondPlayer;
+    WinnerDialog dialog;
 
-    public MyListener(GameField gamefield, GamePanel gamePanel, Player firstPlayer, Player secondPlayer) {
-        this.gameField = gamefield;
-        this.gamePanel = gamePanel;
-        this.firstPlayer = firstPlayer;
-        this.firstPlayer.setActive(true);
-        this.secondPlayer = secondPlayer;
-        this.secondPlayer.setActive(false);
+    public synchronized GameField getGameField() {
+        return gameField;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
+    public void setGameField(GameField gameField) {
+        this.gameField = gameField;
+    }
+    int currentX;
+    int currentY;
+    boolean isClicked = false;
+
+    public MyListener(GameField gamefield, GamePanel gamePanel) {
+        this.gameField = gamefield;
+        this.gamePanel = gamePanel;
+    }
+
+    public void makeMove(int x, int y, boolean active) {
+
+        isClicked = false;
+        currentX = x;
+        currentY = y;
 
         int previousIndicator = 0;
         int nextIndicator = 0;
 
+        //Закраска горизонтальных границ
         for (int i = 0; i < 11; i++) {
             for (int j = 0; j < 10; j++) {
-                if ((e.getX() - 6) > this.gameField.getHorizontalBorders()[i][j].getX()
-                        && (e.getX() - 6) < (this.gameField.getHorizontalBorders()[i][j].getX() + this.gameField.getHorizontalBorders()[i][j].getWidth())
-                        && (e.getY() - 6) > this.gameField.getHorizontalBorders()[i][j].getY()
-                        && (e.getY() - 6) < (this.gameField.getHorizontalBorders()[i][j].getY() + this.gameField.getHorizontalBorders()[i][j].getHeigth())) {
-                    this.gameField.getHorizontalBorders()[i][j].setColor(Color.BLACK);
-                    nextIndicator++;
+                if ((x - 6) > gameField.getGame().getHorizontalBorders()[i][j].getX()
+                        && (x - 6) < (gameField.getGame().getHorizontalBorders()[i][j].getX()
+                        + gameField.getGame().getHorizontalBorders()[i][j].getWidth())
+                        && (y - 6) > gameField.getGame().getHorizontalBorders()[i][j].getY()
+                        && (y - 6) < (gameField.getGame().getHorizontalBorders()[i][j].getY()
+                        + gameField.getGame().getHorizontalBorders()[i][j].getHeigth())) {
+                    if (gameField.getGame().getHorizontalBorders()[i][j].getColor().equals(Color.BLACK)) {
+                        return;
+                    } else {
+                        gameField.getGame().getHorizontalBorders()[i][j].setColor(Color.BLACK);
+                        nextIndicator++;
+                    }
                 }
             }
         }
 
+        //Закраска вертикальных границ
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 11; j++) {
-                if ((e.getX() - 6) > this.gameField.getVerticalBorders()[i][j].getX()
-                        && (e.getX() - 6) < this.gameField.getVerticalBorders()[i][j].getX() + this.gameField.getVerticalBorders()[i][j].getWidth()
-                        && (e.getY() - 6) > this.gameField.getVerticalBorders()[i][j].getY()
-                        && (e.getY() - 6) < this.gameField.getVerticalBorders()[i][j].getY() + this.gameField.getVerticalBorders()[i][j].getHeigth()) {
-                    this.gameField.getVerticalBorders()[i][j].setColor(Color.BLACK);
-                    nextIndicator++;
+                if ((x - 6) > gameField.getGame().getVerticalBorders()[i][j].getX()
+                        && (x - 6) < gameField.getGame().getVerticalBorders()[i][j].getX()
+                        + gameField.getGame().getVerticalBorders()[i][j].getWidth()
+                        && (y - 6) > gameField.getGame().getVerticalBorders()[i][j].getY()
+                        && (y - 6) < gameField.getGame().getVerticalBorders()[i][j].getY()
+                        + gameField.getGame().getVerticalBorders()[i][j].getHeigth()) {
+                    if (gameField.getGame().getVerticalBorders()[i][j].getColor().equals(Color.BLACK)) {
+                        return;
+                    } else {
+                        gameField.getGame().getVerticalBorders()[i][j].setColor(Color.BLACK);
+                        nextIndicator++;
+                    }
                 }
             }
         }
 
-        if (this.firstPlayer.isActive()) {
+        //Проверка на закрашенность клетки
+        if (active == false) {
             int firstInspector = 0;
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {
-                    if (this.gameField.getCells()[i][j].getHorizontalBorders()[0].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getHorizontalBorders()[1].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getVerticalBorders()[0].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getVerticalBorders()[1].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getColor().equals(Color.WHITE)) {
-                        this.gameField.getCells()[i][j].setColor(Color.RED);
-                        this.firstPlayer.increaseScore();
-                        this.firstPlayer.setActive(true);
-                        this.secondPlayer.setActive(false);
-                        firstInspector++;
+                    if (gameField.getGame().getCells()[i][j].getHorizontalBorders()[0].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getHorizontalBorders()[1].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getVerticalBorders()[0].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getVerticalBorders()[1].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getColor().equals(Color.WHITE)) {
+                        gameField.getGame().getCells()[i][j].setColor(Color.RED);
+                        gameField.getGame().increaseClientScore();
+                        firstInspector++; //Если уже закрасил одну ячейку, чтобы дальше при проверке не произошел переход хода
                     } else if (firstInspector == 0) {
-                        if ((nextIndicator - previousIndicator) > 0) {
-                            this.firstPlayer.setActive(false);
-                            this.secondPlayer.setActive(true);
+                        if ((nextIndicator - previousIndicator) > 0) { //Для того, чтобы не переходил ход при нажатии на пустую клетку
+                            gameField.getGame().setActivePlayer(true);
                             previousIndicator++;
+                            gamePanel.repaint();
                         }
                     }
                 }
             }
-            if (this.firstPlayer.isActive()) {
-                System.out.println("1");
-            } else {
-                System.out.println("2");
+            if (gamePanel.getGameField().getGame().getActivePlayer() == false) {
+                System.out.println("Ходит клиент 1");
+            } else if (gamePanel.getGameField().getGame().getActivePlayer() == true) {
+                System.out.println("Ходит сервер 1");
             }
-
-        } else if (this.secondPlayer.isActive()) {
+        } else if (active == true) {
             int secondInspector = 0;
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {
-                    if (this.gameField.getCells()[i][j].getHorizontalBorders()[0].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getHorizontalBorders()[1].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getVerticalBorders()[0].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getVerticalBorders()[1].getColor().equals(Color.BLACK)
-                            && this.gameField.getCells()[i][j].getColor().equals(Color.WHITE)) {
-                        this.gameField.getCells()[i][j].setColor(Color.BLUE);
-                        this.secondPlayer.increaseScore();
-                        this.firstPlayer.setActive(false);
-                        this.secondPlayer.setActive(true);
+                    if (gameField.getGame().getCells()[i][j].getHorizontalBorders()[0].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getHorizontalBorders()[1].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getVerticalBorders()[0].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getVerticalBorders()[1].getColor().equals(Color.BLACK)
+                            && gameField.getGame().getCells()[i][j].getColor().equals(Color.WHITE)) {
+                        gameField.getGame().getCells()[i][j].setColor(Color.BLUE);
+                        gameField.getGame().increaseServerScore();
                         secondInspector++;
                     } else if (secondInspector == 0) {
                         if ((nextIndicator - previousIndicator) > 0) {
-                            this.firstPlayer.setActive(true);
-                            this.secondPlayer.setActive(false);
+                            gameField.getGame().setActivePlayer(false);
                             previousIndicator++;
+                            gamePanel.repaint();
                         }
                     }
                 }
             }
-            if (this.firstPlayer.isActive()) {
-                System.out.println("1");
+            if (gamePanel.getGameField().getGame().getActivePlayer() == false) {
+                System.out.println("Ходит клиент 2");
+            } else if (gamePanel.getGameField().getGame().getActivePlayer() == true) {
+                System.out.println("Ходит сервер 2");
+            }
+        }
+
+        if (gamePanel.getGameField().getGame().getClientScore()
+                + gamePanel.getGameField().getGame().getServerScore() == 3) {
+            gamePanel.getGameField().getGame().setIsFinished(true);
+            if (gamePanel.getGameField().getGame().getClientScore()
+                    > gamePanel.getGameField().getGame().getServerScore()) {
+                dialog = new WinnerDialog(gamePanel, "Player 1");
+                dialog.setLocation(500,300);
+                dialog.setVisible(true);
+                gamePanel.setEnabled(false);
+            } else if (gamePanel.getGameField().getGame().getClientScore()
+                    < gamePanel.getGameField().getGame().getServerScore()) {
+                dialog = new WinnerDialog(gamePanel, "Player 2");
+                dialog.setLocation(500,300);
+                dialog.setVisible(true);
+                gamePanel.setEnabled(false);
             } else {
-                System.out.println("2");
+                dialog = new WinnerDialog(gamePanel, "");
+                dialog.setLocation(500,300);
+                dialog.setVisible(true);
+                gamePanel.setEnabled(false);
             }
         }
         gamePanel.repaint();
+    }
+
+    public int getCurrentX() {
+        return currentX;
+    }
+
+    public void setCurrentX(int currentX) {
+        this.currentX = currentX;
+    }
+
+    public int getCurrentY() {
+        return currentY;
+    }
+
+    public void setCurrentY(int currentY) {
+        this.currentY = currentY;
+    }
+
+    public boolean isClicked() {
+        return this.isClicked;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        isClicked = true;
+        gameField.getGame().setCurrentX(e.getX());
+        gameField.getGame().setCurrentY(e.getY());
+        makeMove(e.getX(), e.getY(), gameField.getGame().getActivePlayer());
     }
 
     @Override
@@ -126,17 +196,14 @@ public class MyListener implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
     }
 
 }

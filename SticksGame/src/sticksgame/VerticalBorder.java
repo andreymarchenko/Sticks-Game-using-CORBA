@@ -6,12 +6,13 @@
 package sticksgame;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  *
  * @author Andrey
  */
-public class VerticalBorder {
+public class VerticalBorder implements Serializable{
 
     private Color color;
     private int x;
